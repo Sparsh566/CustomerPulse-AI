@@ -10,6 +10,7 @@ import ComplaintDetailPage from "./pages/ComplaintDetailPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import ReportsPage from "./pages/ReportsPage";
 import AdminPage from "./pages/AdminPage";
+import AgentPerformancePage from "./pages/AgentPerformancePage";
 import LoginPage from "./pages/LoginPage";
 import NewComplaintPage from "./pages/NewComplaintPage";
 import TrackComplaintPage from "./pages/TrackComplaintPage";
