@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,6 +61,54 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        navy: {
+          950: "hsl(var(--navy-950))",
+          900: "hsl(var(--navy-900))",
+          800: "hsl(var(--navy-800))",
+          700: "hsl(var(--navy-700))",
+        },
+        status: {
+          new: "hsl(var(--status-new))",
+          "new-bg": "hsl(var(--status-new-bg))",
+          assigned: "hsl(var(--status-assigned))",
+          "assigned-bg": "hsl(var(--status-assigned-bg))",
+          "in-progress": "hsl(var(--status-in-progress))",
+          "in-progress-bg": "hsl(var(--status-in-progress-bg))",
+          pending: "hsl(var(--status-pending))",
+          "pending-bg": "hsl(var(--status-pending-bg))",
+          resolved: "hsl(var(--status-resolved))",
+          "resolved-bg": "hsl(var(--status-resolved-bg))",
+          closed: "hsl(var(--status-closed))",
+          "closed-bg": "hsl(var(--status-closed-bg))",
+        },
+        severity: {
+          low: "hsl(var(--severity-low))",
+          "low-bg": "hsl(var(--severity-low-bg))",
+          medium: "hsl(var(--severity-medium))",
+          "medium-bg": "hsl(var(--severity-medium-bg))",
+          high: "hsl(var(--severity-high))",
+          "high-bg": "hsl(var(--severity-high-bg))",
+          critical: "hsl(var(--severity-critical))",
+          "critical-bg": "hsl(var(--severity-critical-bg))",
+        },
+        sentiment: {
+          positive: "hsl(var(--sentiment-positive))",
+          "positive-bg": "hsl(var(--sentiment-positive-bg))",
+          neutral: "hsl(var(--sentiment-neutral))",
+          "neutral-bg": "hsl(var(--sentiment-neutral-bg))",
+          negative: "hsl(var(--sentiment-negative))",
+          "negative-bg": "hsl(var(--sentiment-negative-bg))",
+          angry: "hsl(var(--sentiment-angry))",
+          "angry-bg": "hsl(var(--sentiment-angry-bg))",
+        },
+        sla: {
+          "on-track": "hsl(var(--sla-on-track))",
+          "on-track-bg": "hsl(var(--sla-on-track-bg))",
+          "at-risk": "hsl(var(--sla-at-risk))",
+          "at-risk-bg": "hsl(var(--sla-at-risk-bg))",
+          breached: "hsl(var(--sla-breached))",
+          "breached-bg": "hsl(var(--sla-breached-bg))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -65,20 +117,12 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
