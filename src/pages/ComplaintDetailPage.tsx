@@ -69,9 +69,6 @@ export default function ComplaintDetailPage() {
           <Button variant="outline" size="sm">
             <AlertTriangle className="w-4 h-4 mr-1" /> Escalate
           </Button>
-          <Button variant="default" size="sm">
-            <Sparkles className="w-4 h-4 mr-1" /> AI Draft Response
-          </Button>
         </div>
       </div>
 
