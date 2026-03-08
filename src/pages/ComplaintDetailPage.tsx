@@ -235,7 +235,7 @@ export default function ComplaintDetailPage() {
             </div>
           </Card>
 
-          <AgentAssignment complaint={complaint} />
+          {isSupervisor && <AgentAssignment complaint={complaint} />}
 
           <DuplicateDetector complaint={complaint} />
 
