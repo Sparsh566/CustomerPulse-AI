@@ -231,27 +231,7 @@ export default function ComplaintDetailPage() {
             </div>
           </Card>
 
-          <Card className="p-5 border border-border">
-            <div className="flex items-center gap-2 mb-4">
-              <Shield className="w-4 h-4 text-primary" />
-              <h3 className="text-sm font-semibold text-foreground">Assignment</h3>
-            </div>
-            {complaint.assigned_agent_name ? (
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
-                    {complaint.assigned_agent_name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium text-foreground">{complaint.assigned_agent_name}</p>
-                  <p className="text-xs text-muted-foreground">Agent</p>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground italic">Not yet assigned</p>
-            )}
-          </Card>
+          <AgentAssignment complaint={complaint} />
 
           {auditLog.length > 0 && (
             <Card className="p-5 border border-border">
