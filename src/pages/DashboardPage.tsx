@@ -109,6 +109,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Predictive SLA + Table */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        <div className="xl:col-span-3">
       {/* Table */}
       <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
