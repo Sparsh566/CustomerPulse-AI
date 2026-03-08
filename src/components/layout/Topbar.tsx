@@ -1,4 +1,5 @@
-import { Bell, Search, Menu, LogOut } from 'lucide-react';
+import { Search, Menu, LogOut } from 'lucide-react';
+import NotificationBell from '@/components/layout/NotificationBell';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -33,10 +34,7 @@ export default function Topbar({ onMenuClick, title = 'Dashboard' }: TopbarProps
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input placeholder="Search complaints..." className="pl-9 w-64 h-9 text-sm bg-background" />
         </div>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-destructive" />
-        </Button>
+        <NotificationBell />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-muted transition-colors">
