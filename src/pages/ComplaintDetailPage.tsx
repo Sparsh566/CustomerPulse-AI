@@ -143,6 +143,9 @@ export default function ComplaintDetailPage() {
             )}
           </Card>
 
+          {/* AI Response Generator */}
+          <AIResponseGenerator complaint={complaint} />
+
           {/* Conversation */}
           <Card className="p-5 border border-border">
             <div className="flex items-center gap-2 mb-4">
