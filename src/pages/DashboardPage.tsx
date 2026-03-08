@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useComplaints, useAgents } from '@/hooks/useComplaints';
+import { useAuth } from '@/hooks/useAuth';
 import AppShell from '@/components/layout/AppShell';
 import KPICard from '@/components/dashboard/KPICard';
 import StatusBadge from '@/components/complaint/StatusBadge';
