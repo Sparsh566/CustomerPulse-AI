@@ -181,6 +181,7 @@ export default function ComplaintDetailPage() {
                 </div>
               ))}
             </div>
+            <MessageComposer complaint={complaint} />
           </Card>
         </div>
 

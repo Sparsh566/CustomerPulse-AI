@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.predict-sla]
 verify_jwt = false
+
+[functions.track-complaint]
+verify_jwt = false
