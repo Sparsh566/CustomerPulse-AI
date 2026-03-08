@@ -15,6 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MessageSquarePlus, FileBarChart, AlertTriangle, Clock, Eye, ArrowUpDown } from 'lucide-react';
+import PredictiveSLAWidget from '@/components/dashboard/PredictiveSLAWidget';
 import { ComplaintStatus, ComplaintPriority, ComplaintCategory } from '@/types/complaint';
 import { STATUS_LABELS, PRIORITY_LABELS, CATEGORY_LABELS } from '@/lib/constants';
 import { format } from 'date-fns';
@@ -108,6 +109,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Predictive SLA + Table */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        <div className="xl:col-span-3">
       {/* Table */}
       <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
@@ -180,6 +184,11 @@ export default function DashboardPage() {
               ))}
             </TableBody>
           </Table>
+        </div>
+      </div>
+        </div>
+        <div className="xl:col-span-1">
+          <PredictiveSLAWidget />
         </div>
       </div>
     </AppShell>

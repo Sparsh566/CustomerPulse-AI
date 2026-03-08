@@ -8,6 +8,8 @@ import SLABadge from '@/components/complaint/SLABadge';
 import CategoryBadge from '@/components/complaint/CategoryBadge';
 import ChannelIcon from '@/components/complaint/ChannelIcon';
 import AgentAssignment from '@/components/complaint/AgentAssignment';
+import AIResponseGenerator from '@/components/complaint/AIResponseGenerator';
+import DuplicateDetector from '@/components/complaint/DuplicateDetector';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -66,9 +68,6 @@ export default function ComplaintDetailPage() {
         <div className="ml-auto flex items-center gap-2">
           <Button variant="outline" size="sm">
             <AlertTriangle className="w-4 h-4 mr-1" /> Escalate
-          </Button>
-          <Button variant="default" size="sm">
-            <Sparkles className="w-4 h-4 mr-1" /> AI Draft Response
           </Button>
         </div>
       </div>
@@ -143,6 +142,9 @@ export default function ComplaintDetailPage() {
               </div>
             )}
           </Card>
+
+          {/* AI Response Generator */}
+          <AIResponseGenerator complaint={complaint} />
 
           {/* Conversation */}
           <Card className="p-5 border border-border">
@@ -232,6 +234,8 @@ export default function ComplaintDetailPage() {
           </Card>
 
           <AgentAssignment complaint={complaint} />
+
+          <DuplicateDetector complaint={complaint} />
 
           {auditLog.length > 0 && (
             <Card className="p-5 border border-border">

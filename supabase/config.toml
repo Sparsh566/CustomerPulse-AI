@@ -8,3 +8,12 @@ verify_jwt = false
 
 [functions.sla-monitor]
 verify_jwt = false
+
+[functions.generate-response]
+verify_jwt = false
+
+[functions.detect-duplicates]
+verify_jwt = false
+
+[functions.predict-sla]
+verify_jwt = false
