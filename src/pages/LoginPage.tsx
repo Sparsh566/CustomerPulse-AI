@@ -71,7 +71,7 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 text-center space-y-2">
           <button
             type="button"
             onClick={() => setIsSignUp(!isSignUp)}
@@ -79,6 +79,15 @@ export default function LoginPage() {
           >
             {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
           </button>
+          <div className="border-t border-border pt-3">
+            <button
+              type="button"
+              onClick={() => navigate('/track')}
+              className="text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              🔍 Track your complaint status
+            </button>
+          </div>
         </div>
       </Card>
     </div>
