@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
+  Users,
 } from 'lucide-react';
 
 interface NavItem {
