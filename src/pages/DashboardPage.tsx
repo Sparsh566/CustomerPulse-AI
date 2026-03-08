@@ -186,6 +186,11 @@ export default function DashboardPage() {
           </Table>
         </div>
       </div>
+        </div>
+        <div className="xl:col-span-1">
+          <PredictiveSLAWidget />
+        </div>
+      </div>
     </AppShell>
   );
 }
