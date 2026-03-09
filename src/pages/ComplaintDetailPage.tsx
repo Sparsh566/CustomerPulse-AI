@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useComplaint, useComplaintMessages, useAuditLog } from '@/hooks/useComplaints';
+import { useComplaint, useComplaintMessages, useAuditLog, useUpdateComplaint } from '@/hooks/useComplaints';
 import AppShell from '@/components/layout/AppShell';
 import StatusBadge from '@/components/complaint/StatusBadge';
 import SeverityBadge from '@/components/complaint/SeverityBadge';
@@ -16,10 +16,12 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Brain, AlertTriangle, User, Clock, MessageSquare, Sparkles, Lock } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 export default function ComplaintDetailPage() {
   const { id } = useParams();
