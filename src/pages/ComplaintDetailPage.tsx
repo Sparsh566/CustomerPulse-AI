@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useComplaint, useComplaintMessages, useAuditLog } from '@/hooks/useComplaints';
+import { useComplaint, useComplaintMessages, useAuditLog, useUpdateComplaint } from '@/hooks/useComplaints';
 import AppShell from '@/components/layout/AppShell';
 import StatusBadge from '@/components/complaint/StatusBadge';
 import SeverityBadge from '@/components/complaint/SeverityBadge';
@@ -16,15 +16,18 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Brain, AlertTriangle, User, Clock, MessageSquare, Sparkles, Lock } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 export default function ComplaintDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isSupervisor } = useAuth();
+  const updateComplaint = useUpdateComplaint();
   const { data: complaint, isLoading } = useComplaint(id);
   const { data: messages = [] } = useComplaintMessages(id);
   const { data: auditLog = [] } = useAuditLog(id);
@@ -69,7 +72,44 @@ export default function ComplaintDetailPage() {
         <StatusBadge status={complaint.status} />
         <SeverityBadge severity={complaint.priority} />
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <Select
+            value={complaint.status}
+            onValueChange={(value) => {
+              updateComplaint.mutate(
+                { id: complaint.id, status: value },
+                {
+                  onSuccess: () => toast.success(`Status updated to ${value.replace('_', ' ')}`),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to update'),
+                }
+              );
+            }}
+          >
+            <SelectTrigger className="w-40 h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="new">New</SelectItem>
+              <SelectItem value="assigned">Assigned</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="pending_customer">Pending Customer</SelectItem>
+              <SelectItem value="resolved">Resolved</SelectItem>
+              <SelectItem value="closed">Closed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              updateComplaint.mutate(
+                { id: complaint.id, priority: 'critical', status: 'in_progress' },
+                {
+                  onSuccess: () => toast.success('Complaint escalated to CRITICAL priority'),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to escalate'),
+                }
+              );
+            }}
+            disabled={complaint.priority === 'critical'}
+          >
             <AlertTriangle className="w-4 h-4 mr-1" /> Escalate
           </Button>
         </div>
