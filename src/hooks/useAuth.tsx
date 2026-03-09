@@ -67,8 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function fetchProfile(userId: string) {
-    const { data } = await supabase.from('profiles').select('full_name, avatar_url, department').eq('user_id', userId).single();
-    if (data) setProfile(data);
+    const { data } = await supabase.from('profiles').select('full_name, avatar_url, department, is_approved').eq('user_id', userId).single();
+    if (data) setProfile(data as any);
   }
 
   async function fetchRoles(userId: string) {
