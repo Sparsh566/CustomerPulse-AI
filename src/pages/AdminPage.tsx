@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { Plus, Pencil, Users, Clock, Tag, Settings } from 'lucide-react';
+import { Plus, Pencil, Users, Clock, Tag, Settings, UserCheck, AlertCircle } from 'lucide-react';
 import { CATEGORY_LABELS, PRIORITY_LABELS } from '@/lib/constants';
 
 // ─── Agents Tab ─────────────────────────────────────────────
@@ -410,17 +410,138 @@ function SettingsTab() {
   );
 }
 
+// ─── User Approvals Tab ─────────────────────────────────────
+function ApprovalsTab() {
+  const queryClient = useQueryClient();
+  const { data: pendingUsers = [], isLoading } = useQuery({
+    queryKey: ['pending-approvals'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, user_id, full_name, created_at, is_approved')
+        .eq('is_approved', false)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+
+      // Fetch roles for each pending user
+      const userIds = (data || []).map(p => p.user_id);
+      const { data: rolesData } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .in('user_id', userIds);
+
+      return (data || []).map(p => ({
+        ...p,
+        role: rolesData?.find(r => r.user_id === p.user_id)?.role || 'agent',
+      }));
+    },
+  });
+
+  const approve = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_approved: true } as any)
+        .eq('user_id', userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pending-approvals'] });
+      toast.success('User approved successfully');
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  if (isLoading) return <Skeleton className="h-64 rounded-lg" />;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-muted-foreground">{pendingUsers.length} pending approval{pendingUsers.length !== 1 ? 's' : ''}</p>
+      </div>
+      {pendingUsers.length === 0 ? (
+        <Card className="p-12 border border-border text-center">
+          <UserCheck className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground">No pending approvals</p>
+        </Card>
+      ) : (
+        <Card className="border border-border overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                <TableHead className="text-xs font-semibold">Name</TableHead>
+                <TableHead className="text-xs font-semibold">Role Requested</TableHead>
+                <TableHead className="text-xs font-semibold">Signed Up</TableHead>
+                <TableHead className="text-xs font-semibold w-32">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pendingUsers.map((user: any) => (
+                <TableRow key={user.id} className="hover:bg-muted/30">
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-7 w-7">
+                        <AvatarFallback className="text-[10px] bg-secondary text-secondary-foreground">
+                          {(user.full_name || '?').split(' ').map((n: string) => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium text-foreground">{user.full_name || 'Unknown'}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-xs capitalize">{user.role}</Badge>
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {new Date(user.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <Button size="sm" onClick={() => approve.mutate(user.user_id)} disabled={approve.isPending}>
+                      <UserCheck className="w-3.5 h-3.5 mr-1.5" />
+                      Approve
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Admin Page ────────────────────────────────────────
 export default function AdminPage() {
+  const { data: pendingCount = 0 } = useQuery({
+    queryKey: ['pending-approvals-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_approved', false);
+      if (error) return 0;
+      return count || 0;
+    },
+  });
+
   return (
     <AppShell title="Admin Panel">
-      <Tabs defaultValue="agents" className="w-full">
+      <Tabs defaultValue="approvals" className="w-full">
         <TabsList className="mb-6">
+          <TabsTrigger value="approvals" className="gap-1.5 relative">
+            <UserCheck className="w-4 h-4" />Approvals
+            {pendingCount > 0 && (
+              <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold">
+                {pendingCount}
+              </span>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="agents" className="gap-1.5"><Users className="w-4 h-4" />Agents</TabsTrigger>
           <TabsTrigger value="sla" className="gap-1.5"><Clock className="w-4 h-4" />SLA Rules</TabsTrigger>
           <TabsTrigger value="categories" className="gap-1.5"><Tag className="w-4 h-4" />Categories</TabsTrigger>
           <TabsTrigger value="settings" className="gap-1.5"><Settings className="w-4 h-4" />Settings</TabsTrigger>
         </TabsList>
+        <TabsContent value="approvals"><ApprovalsTab /></TabsContent>
         <TabsContent value="agents"><AgentsTab /></TabsContent>
         <TabsContent value="sla"><SLARulesTab /></TabsContent>
         <TabsContent value="categories"><CategoriesTab /></TabsContent>

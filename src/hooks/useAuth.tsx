@@ -7,9 +7,10 @@ export type AppRole = 'admin' | 'manager' | 'supervisor' | 'agent';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  profile: { full_name: string | null; avatar_url: string | null; department: string | null } | null;
+  profile: { full_name: string | null; avatar_url: string | null; department: string | null; is_approved: boolean } | null;
   roles: AppRole[];
   loading: boolean;
+  isApproved: boolean;
   hasRole: (role: AppRole) => boolean;
   hasAnyRole: (...roles: AppRole[]) => boolean;
   isAdmin: boolean;
@@ -17,7 +18,7 @@ interface AuthContextType {
   isSupervisor: boolean;
   primaryRole: AppRole;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, role?: 'agent' | 'manager') => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -66,8 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function fetchProfile(userId: string) {
-    const { data } = await supabase.from('profiles').select('full_name, avatar_url, department').eq('user_id', userId).single();
-    if (data) setProfile(data);
+    const { data } = await supabase.from('profiles').select('full_name, avatar_url, department, is_approved').eq('user_id', userId).single();
+    if (data) setProfile(data as any);
   }
 
   async function fetchRoles(userId: string) {
@@ -94,10 +95,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error: error as Error | null };
   }
 
-  async function signUp(email: string, password: string, fullName: string) {
+  const isApproved = useMemo(() => profile?.is_approved ?? false, [profile]);
+
+  async function signUp(email: string, password: string, fullName: string, role: 'agent' | 'manager' = 'agent') {
     const { error } = await supabase.auth.signUp({
       email, password,
-      options: { data: { full_name: fullName }, emailRedirectTo: window.location.origin }
+      options: { data: { full_name: fullName, role }, emailRedirectTo: window.location.origin }
     });
     return { error: error as Error | null };
   }
@@ -108,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={{
-      user, session, profile, roles, loading,
+      user, session, profile, roles, loading, isApproved,
       hasRole, hasAnyRole, isAdmin, isManager, isSupervisor, primaryRole,
       signIn, signUp, signOut,
     }}>
