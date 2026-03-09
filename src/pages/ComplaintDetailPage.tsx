@@ -72,7 +72,44 @@ export default function ComplaintDetailPage() {
         <StatusBadge status={complaint.status} />
         <SeverityBadge severity={complaint.priority} />
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <Select
+            value={complaint.status}
+            onValueChange={(value) => {
+              updateComplaint.mutate(
+                { id: complaint.id, status: value },
+                {
+                  onSuccess: () => toast.success(`Status updated to ${value.replace('_', ' ')}`),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to update'),
+                }
+              );
+            }}
+          >
+            <SelectTrigger className="w-40 h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="new">New</SelectItem>
+              <SelectItem value="assigned">Assigned</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="pending_customer">Pending Customer</SelectItem>
+              <SelectItem value="resolved">Resolved</SelectItem>
+              <SelectItem value="closed">Closed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              updateComplaint.mutate(
+                { id: complaint.id, priority: 'critical', status: 'in_progress' },
+                {
+                  onSuccess: () => toast.success('Complaint escalated to CRITICAL priority'),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to escalate'),
+                }
+              );
+            }}
+            disabled={complaint.priority === 'critical'}
+          >
             <AlertTriangle className="w-4 h-4 mr-1" /> Escalate
           </Button>
         </div>
