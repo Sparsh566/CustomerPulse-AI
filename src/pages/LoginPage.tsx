@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Shield, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -16,15 +17,20 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [selectedRole, setSelectedRole] = useState<'agent' | 'manager'>('agent');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
       if (isSignUp) {
-        const { error } = await signUp(email, password, fullName);
+        const { error } = await signUp(email, password, fullName, selectedRole);
         if (error) throw error;
-        toast.success('Account created! Check your email to verify.');
+        if (selectedRole === 'manager') {
+          toast.success('Account created! A manager must approve your account before you can sign in. Check your email to verify.');
+        } else {
+          toast.success('Account created! Check your email to verify.');
+        }
       } else {
         const { error } = await signIn(email, password);
         if (error) throw error;
@@ -52,10 +58,30 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
-              <Input id="name" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Enter your full name" required />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
+                <Input id="name" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Enter your full name" required />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Role</Label>
+                <RadioGroup value={selectedRole} onValueChange={(v) => setSelectedRole(v as 'agent' | 'manager')} className="flex gap-4">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="agent" id="role-agent" />
+                    <Label htmlFor="role-agent" className="text-sm cursor-pointer">Agent</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="manager" id="role-manager" />
+                    <Label htmlFor="role-manager" className="text-sm cursor-pointer">Manager</Label>
+                  </div>
+                </RadioGroup>
+                {selectedRole === 'manager' && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ⚠️ Manager accounts require approval from an existing manager before activation.
+                  </p>
+                )}
+              </div>
+            </>
           )}
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium">Email</Label>
