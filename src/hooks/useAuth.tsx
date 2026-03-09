@@ -7,9 +7,10 @@ export type AppRole = 'admin' | 'manager' | 'supervisor' | 'agent';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  profile: { full_name: string | null; avatar_url: string | null; department: string | null } | null;
+  profile: { full_name: string | null; avatar_url: string | null; department: string | null; is_approved: boolean } | null;
   roles: AppRole[];
   loading: boolean;
+  isApproved: boolean;
   hasRole: (role: AppRole) => boolean;
   hasAnyRole: (...roles: AppRole[]) => boolean;
   isAdmin: boolean;
@@ -17,7 +18,7 @@ interface AuthContextType {
   isSupervisor: boolean;
   primaryRole: AppRole;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, role?: 'agent' | 'manager') => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
