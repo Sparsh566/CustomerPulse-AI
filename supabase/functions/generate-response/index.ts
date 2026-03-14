@@ -9,8 +9,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const AI_GATEWAY_API_KEY = Deno.env.get("AI_GATEWAY_API_KEY");
+    const AI_GATEWAY_URL = Deno.env.get("AI_GATEWAY_URL") || "https://openrouter.ai/api/v1/chat/completions";
+    if (!AI_GATEWAY_API_KEY) throw new Error("AI_GATEWAY_API_KEY is not configured");
 
     const { complaint_id, subject, body, category, customer_name, tone, conversation_history } = await req.json();
     if (!body || !tone) throw new Error("body and tone are required");
@@ -37,10 +38,10 @@ Write a 2-3 paragraph response that:
 3. Provides next steps or timeline
 4. Closes professionally`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(AI_GATEWAY_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${AI_GATEWAY_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

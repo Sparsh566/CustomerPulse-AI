@@ -9,10 +9,11 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const AI_GATEWAY_API_KEY = Deno.env.get("AI_GATEWAY_API_KEY");
+    const AI_GATEWAY_URL = Deno.env.get("AI_GATEWAY_URL") || "https://openrouter.ai/api/v1/chat/completions";
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    if (!AI_GATEWAY_API_KEY) throw new Error("AI_GATEWAY_API_KEY is not configured");
 
     const { complaint_id, subject, body, category, customer_name } = await req.json();
     if (!complaint_id || !body) throw new Error("complaint_id and body are required");
@@ -60,10 +61,10 @@ Identify complaints that are:
 
 Only include matches with similarity >= 60%. Return the indices of matching complaints.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(AI_GATEWAY_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${AI_GATEWAY_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

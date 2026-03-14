@@ -375,7 +375,7 @@ function SettingsTab() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="grid gap-2">
             <Label className="text-xs text-muted-foreground">Bank Name</Label>
-            <Input defaultValue="BankComplain AI" placeholder="Your bank name" />
+            <Input defaultValue="CustomerPulse AI" placeholder="Your bank name" />
           </div>
           <div className="grid gap-2">
             <Label className="text-xs text-muted-foreground">RBI License No.</Label>

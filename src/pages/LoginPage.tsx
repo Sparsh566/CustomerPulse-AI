@@ -50,7 +50,7 @@ export default function LoginPage() {
           <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary mb-3">
             <Shield className="w-6 h-6 text-primary-foreground" />
           </div>
-          <h1 className="text-xl font-bold text-foreground">BankComplain AI</h1>
+          <h1 className="text-xl font-bold text-foreground">CustomerPulse AI</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {isSignUp ? 'Create your account' : 'Sign in to your dashboard'}
           </p>

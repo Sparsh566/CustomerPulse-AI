@@ -56,7 +56,7 @@ export default function AppSidebar({ collapsed, onToggle }: { collapsed: boolean
         </div>
         {!collapsed && (
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-sidebar-foreground tracking-tight">BankComplain</span>
+            <span className="text-sm font-bold text-sidebar-foreground tracking-tight">CustomerPulse</span>
             <span className="text-[10px] font-medium text-primary opacity-80">AI</span>
           </div>
         )}

@@ -1,73 +1,48 @@
-# Welcome to your Lovable project
+# CustomerPulse AI
 
-## Project info
+CustomerPulse AI is a complaint management platform built with React, TypeScript, Vite, shadcn-ui, and Tailwind CSS.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Project Title
 
-## How can I edit this code?
+CustomerPulse AI
 
-There are several ways of editing your application.
+## Abstract / Idea Description (150–300 words)
 
-**Use Lovable**
+CustomerPulse AI is an intelligent grievance management platform designed to help organizations receive, analyze, prioritize, and resolve customer complaints faster and more transparently. In many institutions, complaints are still handled through fragmented workflows, manual triaging, delayed escalation, and limited visibility into SLA risks. This causes slow turnaround, inconsistent customer communication, and regulatory pressure.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Our solution combines workflow automation with AI-assisted decision support. Incoming complaints are normalized into a unified dashboard where AI helps with issue analysis, category detection, sentiment and severity scoring, duplicate detection, and suggested responses. The platform also supports predictive SLA breach monitoring, agent workload visibility, and actionable insights for managers through trend analysis and root-cause signals. A dedicated complaint tracking view improves transparency for end users by allowing them to check ticket status and communication history.
 
-Changes made via Lovable will be committed automatically to this repo.
+CustomerPulse AI is built to be practical for real operations: role-based access, audit-friendly actions, and extensible Supabase-powered backend services enable quick deployment and scalability. By reducing manual effort and improving prioritization quality, the system helps teams resolve high-impact complaints earlier, improve customer trust, and maintain service-level commitments with measurable operational gains.
 
-**Use your preferred IDE**
+## Selected Theme
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+AI for Customer Experience, Service Operations, and Complaint Resolution (BFSI-focused)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Local development
 
-Follow these steps:
+Requirements:
+- Node.js 18+
+- npm
+
+Run locally:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Available scripts
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- `npm run dev` - start development server
+- `npm run build` - production build
+- `npm run preview` - preview production build
+- `npm run lint` - run ESLint
+- `npm run test` - run Vitest tests
 
-**Use GitHub Codespaces**
+## Stack
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
+- React + TypeScript
 - Vite
-- TypeScript
-- React
-- shadcn-ui
 - Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- shadcn-ui
+- Supabase

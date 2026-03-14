@@ -67,7 +67,7 @@ export default function TrackComplaintPage() {
             <Shield className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-foreground">BankComplain AI</h1>
+            <h1 className="text-base font-bold text-foreground">CustomerPulse AI</h1>
             <p className="text-xs text-muted-foreground">Complaint Tracking Portal</p>
           </div>
         </div>
@@ -216,7 +216,7 @@ export default function TrackComplaintPage() {
       </main>
 
       <footer className="border-t border-border mt-12 py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} BankComplain AI — Secure Complaint Management
+        © {new Date().getFullYear()} CustomerPulse AI — Secure Complaint Management
       </footer>
     </div>
   );

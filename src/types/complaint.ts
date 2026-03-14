@@ -1,4 +1,4 @@
-// Types for BankComplain AI
+// Types for CustomerPulse AI
 
 export type ComplaintStatus = 'new' | 'assigned' | 'in_progress' | 'pending_customer' | 'resolved' | 'closed';
 export type ComplaintPriority = 'low' | 'medium' | 'high' | 'critical';
