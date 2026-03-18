@@ -1,540 +1,400 @@
-# CustomerPulse AI
+# 🚀 CustomerPulse AI
 
-CustomerPulse AI is an AI-powered complaint intelligence and operations platform for BFSI-style support workflows.
+<p align="center">
+  <b>AI-powered complaint intelligence platform for BFSI service operations</b><br/>
+  Intake • Triage • SLA Risk • Resolution • Reporting • Public Tracking
+</p>
 
-It combines:
-- multi-role complaint operations (agent/supervisor/manager/admin),
-- AI-assisted triage and communication,
-- SLA prediction and monitoring,
-- compliance-oriented reporting,
-- and public ticket tracking.
-
----
-
-## 1) Product Goal and Scope
-
-CustomerPulse AI solves common complaint-handling problems:
-- delayed manual triage,
-- non-standard responses,
-- limited manager visibility,
-- weak SLA risk detection,
-- and poor end-customer status transparency.
-
-The platform turns complaint operations into a structured, auditable workflow with AI support at each stage:
-1. complaint intake,
-2. AI analysis and optional auto-routing,
-3. agent collaboration and communication,
-4. SLA risk monitoring,
-5. manager analytics and reporting.
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vite-Build-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
+  <img src="https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
+  <img src="https://img.shields.io/badge/AI-Gemini%203%20Flash-8A2BE2?style=for-the-badge" />
+</p>
 
 ---
 
-## 2) High-Level Architecture
+## ✨ Why this project exists
+
+Traditional complaint workflows are often fragmented, manual, and reactive.
+
+CustomerPulse AI transforms that into an **intelligent, auditable, and role-based operating system** for complaint resolution:
+
+- ⚡ faster triage using AI analysis
+- 🎯 better prioritization and routing
+- ⏱ predictive SLA breach prevention
+- 📊 manager-grade analytics and reports
+- 🔎 transparent customer-facing complaint tracking
+
+---
+
+## 🧩 At a glance
+
+| Layer | What it does | Tech |
+|---|---|---|
+| **Frontend** | Role-based complaint operations UI | React, TypeScript, Vite, shadcn-ui, Tailwind |
+| **Data + Auth** | Secure data model + login/session/roles | Supabase Postgres + Supabase Auth + RLS |
+| **Automation** | Complaint analysis, routing, insights, chat, tracking | Supabase Edge Functions |
+| **AI/NLP** | Sentiment, severity, duplicate detection, response generation, insights, assistant | OpenRouter-compatible gateway + Gemini 3 Flash |
+
+---
+
+## 🗺 Navigation
+
+- [Product Vision](#-product-vision)
+- [Architecture](#-architecture)
+- [Complete Page Guide](#-complete-page-guide)
+- [Auth and Role Model](#-auth-and-role-model)
+- [Hooks and Frontend Function Map](#-hooks-and-frontend-function-map)
+- [AI/NLP Capabilities](#-ainlp-capabilities)
+- [Backend Edge Functions](#-backend-edge-functions)
+- [Database, RLS, Triggers](#-database-rls-triggers)
+- [End-to-End Flows](#-end-to-end-flows)
+- [Run Locally](#-run-locally)
+- [Environment Variables](#-environment-variables)
+- [Known Gaps and Improvements](#-known-gaps-and-improvements)
+
+---
+
+## 🎯 Product Vision
+
+CustomerPulse AI is designed for BFSI-style complaint handling teams where speed, compliance, and transparency matter.
+
+It covers the full lifecycle:
+1. Complaint intake
+2. AI-assisted analysis and optional auto-routing
+3. Agent collaboration and communication
+4. SLA monitoring and notifications
+5. Analytics and compliance reporting
+6. Public complaint tracking
+
+---
+
+## 🏗 Architecture
+
+```mermaid
+flowchart LR
+  A[Customer / Agent / Manager] --> B[React Frontend]
+  B --> C[Supabase Auth]
+  B --> D[Supabase Postgres]
+  B --> E[Supabase Edge Functions]
+  E --> F[AI Gateway]
+  F --> G[Gemini 3 Flash]
+  E --> D
+```
 
 ### Frontend
 - React + TypeScript + Vite
-- React Router for page-level navigation
-- TanStack React Query for query/mutation state
-- shadcn-ui/Radix UI + Tailwind CSS for UI system
+- React Router route-level navigation
+- TanStack React Query state for queries/mutations
+- shadcn-ui + Tailwind for consistent, responsive UI
 
 ### Backend
-- Supabase Postgres (data + RLS)
-- Supabase Auth (user session + signup/signin)
-- Supabase Edge Functions (AI + automation + tracking)
+- Supabase Postgres for core data
+- Supabase Auth for authentication/session
+- Supabase RLS + role helpers for scoped data access
+- Edge functions for AI and operational automation
 
-### AI/NLP Layer
-- OpenRouter-compatible AI Gateway (`AI_GATEWAY_URL`)
-- Model used in all AI edge functions: `google/gemini-3-flash-preview`
-- Structured outputs via tool-calling in multiple functions
-- Streaming SSE for assistant chat
+### AI Layer
+- Gateway URL: `AI_GATEWAY_URL` (defaults to OpenRouter chat completions endpoint)
+- Model: `google/gemini-3-flash-preview`
+- Mix of structured tool-calling + streaming responses
 
 ---
 
-## 3) Route and Page Deep Dive (Every Page)
+## 📄 Complete Page Guide
 
-The app routes are declared in `src/App.tsx`.
+### Route summary
 
-## Public routes
+| Route | Page | Access | Primary purpose |
+|---|---|---|---|
+| `/login` | `LoginPage` | Public | Sign in / sign up with role selection |
+| `/track` | `TrackComplaintPage` | Public | Public complaint tracking by ticket ID |
+| `/` | `DashboardPage` | Protected | Main operations dashboard |
+| `/complaint/:id` | `ComplaintDetailPage` | Protected | Full complaint workspace |
+| `/new-complaint` | `NewComplaintPage` | Protected | Complaint registration form |
+| `/analytics` | `AnalyticsPage` | Admin/Manager/Supervisor | KPI + AI insights + charts + assistant |
+| `/reports` | `ReportsPage` | Admin/Manager/Supervisor | RBI-style and SLA reports with export |
+| `/performance` | `AgentPerformancePage` | Admin/Manager/Supervisor | Agent scorecards and comparisons |
+| `/admin` | `AdminPage` | Admin/Manager | Approvals, agents, SLA rules, settings |
+| `*` | `NotFound` | Public | 404 fallback |
 
-### `/login` → `LoginPage`
-Purpose:
-- authentication entry point for internal users.
+---
 
-UI behavior:
-- toggles between Sign In and Sign Up modes.
-- signup supports role choice (`agent` or `manager`).
+<details>
+<summary><b>🔐 /login → LoginPage (click to expand)</b></summary>
 
-Important functions:
+**Purpose**
+- Internal user authentication.
+
+**UI behavior**
+- Toggle between Sign In and Sign Up.
+- Sign Up supports role selection: `agent` or `manager`.
+- Manager signup shows “requires approval” notice.
+
+**Key function**
 - `handleSubmit(e)`
-	- Sign Up path: calls `signUp(email, password, fullName, selectedRole)`.
-	- Sign In path: calls `signIn(email, password)`, then navigates to `/`.
-	- manager signup shows approval-required notice.
+  - Sign In: `signIn(email, password)` then navigate `/`.
+  - Sign Up: `signUp(email, password, fullName, selectedRole)`.
 
-Data and integrations:
-- auth actions come from `useAuth()`.
-- toasts via `sonner`.
+**Dependencies**
+- `useAuth()` and `sonner` toasts.
 
----
+</details>
 
-### `/track` → `TrackComplaintPage`
-Purpose:
-- public ticket tracking for customers.
+<details>
+<summary><b>🔎 /track → TrackComplaintPage (click to expand)</b></summary>
 
-UI behavior:
-- form accepts ticket format `CMP-YYYY-NNNNNN`.
-- shows complaint status card, progress timeline, and communication history.
+**Purpose**
+- Public complaint tracking portal.
 
-Important functions:
+**UI behavior**
+- Accepts ticket format `CMP-YYYY-NNNNNN`.
+- Renders status card, progression steps, and public messages.
+
+**Key function**
 - `handleTrack(e)`
-	- invokes edge function `track-complaint` with `{ ticket_id }`.
-	- handles not-found and transport errors.
-- local derived state:
-	- `currentStepIndex` for timeline progression,
-	- `statusInfo` from `statusConfig` map.
+  - invokes `track-complaint` edge function with `{ ticket_id }`.
+  - maps and displays complaint/messages.
 
-Data and integrations:
-- `supabase.functions.invoke('track-complaint')`.
+**Derived state**
+- `currentStepIndex` for stage progression.
+- `statusInfo` from status map.
 
----
+</details>
 
-## Protected routes
+<details>
+<summary><b>📊 / → DashboardPage (click to expand)</b></summary>
 
-All protected routes are wrapped by `ProtectedRoute`.
+**Purpose**
+- Daily complaint operations center.
 
-### `/` → `DashboardPage`
-Purpose:
-- daily complaint operations console.
+**Main UI blocks**
+- KPI cards
+- filter + sort toolbar
+- mobile cards and desktop table
+- `PredictiveSLAWidget`
 
-Main sections:
-- KPI cards,
-- filter + sort toolbar,
-- responsive complaint listing (mobile cards + desktop table),
-- `PredictiveSLAWidget` in sidebar.
+**Key functions**
+- `priorityOrder(p)` helper
+- `handleSort(key)`
+- `clearFilters()`
 
-Important functions and logic:
-- `priorityOrder(p)` (file-level helper): priority rank mapping.
-- `handleSort(key)`: toggles sort key/direction.
-- `clearFilters()`: resets filter states.
-- `useMemo` complaint scoping:
-	- supervisors see all complaints,
-	- non-supervisors see assigned-to-self, created-by-self, matching profile full name, or unassigned.
-- `useMemo` filtered/sorted dataset using:
-	- `statusFilter`, `severityFilter`, `categoryFilter`, `sortKey`, `sortAsc`.
+**Core logic**
+- role-scoped complaint visibility:
+  - supervisors: all complaints
+  - others: assigned/self-created/profile-name/unassigned
 
-Data and integrations:
-- `useComplaints()`.
-- auth context from `useAuth()`.
+</details>
 
----
+<details>
+<summary><b>🧠 /complaint/:id → ComplaintDetailPage (click to expand)</b></summary>
 
-### `/complaint/:id` → `ComplaintDetailPage`
-Purpose:
-- complete case workspace for one complaint.
+**Purpose**
+- Full single-complaint workspace.
 
-Main sections:
-- complaint header + quick status update + escalate action,
-- complaint body and metadata,
-- AI analysis panel,
-- AI response generation,
-- threaded conversation + composer,
-- customer and SLA side cards,
-- agent assignment (supervisor+),
-- duplicate detection,
-- audit trail timeline.
+**Main UI blocks**
+- complaint header + status controls + escalation
+- AI analysis card
+- AI response generation
+- conversation thread + composer
+- customer card + SLA card
+- duplicate detector
+- audit trail
 
-Important functions and logic:
-- status `Select` `onValueChange`:
-	- `updateComplaint.mutate({ id, status })`.
-- escalate button action:
-	- sets `{ priority: 'critical', status: 'in_progress' }`.
-- uses loading skeletons and not-found fallback.
+**Key interactions**
+- status update via `updateComplaint.mutate({ id, status })`
+- one-click escalate to `critical` + `in_progress`
 
-Data and integrations:
-- `useComplaint(id)`, `useComplaintMessages(id)`, `useAuditLog(id)`.
-- `useUpdateComplaint()` mutation.
-- child components: `AgentAssignment`, `AIResponseGenerator`, `DuplicateDetector`, `MessageComposer`.
-
----
-
-### `/new-complaint` → `NewComplaintPage`
-Purpose:
-- structured complaint intake form.
-
-Validation:
-- Zod schema `complaintSchema` validates all required fields.
-- integrates React Hook Form with `zodResolver`.
-
-Important functions:
-- `onSubmit(data)`:
-	- calls `createComplaint.mutateAsync(...)`.
-	- on success shows toast and navigates to dashboard.
-
-Data and integrations:
-- `useCreateComplaint()`; AI analysis is triggered asynchronously after insert by the hook.
-
----
-
-### `/analytics` → `AnalyticsPage`
-Access:
-- `admin`, `manager`, `supervisor`.
-
-Purpose:
-- strategic insights + visual analytics + AI assistant hub.
-
-Main sections:
-- KPI cards,
-- tabs:
-	- `AI Insights` (`AIInsightsPanel`),
-	- `AI Assistant` (`AIAgentChat`),
-	- `Charts` (volume/category/sentiment/SLA/leaderboard).
-
-Important functions and logic:
-- `stats` memo computes:
-	- total/resolved/SLA compliance,
-	- 7-day volume,
-	- category and sentiment distributions,
-	- per-agent snapshot metrics.
-
-Note:
-- average resolution field currently uses fixed illustrative fallback (`18.5`) when resolved count exists.
-
----
-
-### `/reports` → `ReportsPage`
-Access:
-- `admin`, `manager`, `supervisor`.
-
-Purpose:
-- compliance and operations reporting (including RBI-style annexure summary).
-
-Main sections:
-- period selector,
-- RBI Annexure tab,
-- SLA Breach tab,
-- CSV/PDF export actions.
-
-Important functions:
-- `exportCSV(data, filename)`: converts complaint rows to CSV and downloads.
-- `exportPDF(data, title)`: generates PDF using `jspdf` + `jspdf-autotable`.
-- `downloadFile(...)`: browser Blob download utility.
-- `getMostCommon(arr)`: helper for highest-frequency category.
-
-Core memos:
-- `filteredComplaints`, `slaBreached`, `annexureStats`.
-
----
-
-### `/performance` → `AgentPerformancePage`
-Access:
-- `admin`, `manager`, `supervisor`.
-
-Purpose:
-- quality and productivity scoring for agents.
-
-Main sections:
-- team KPI summary cards,
-- comparison bar chart,
-- top-3 radar chart,
-- individual scorecards.
-
-Important functions and logic:
-- `scores` memo computes per-agent metrics:
-	- handled/resolved/open,
-	- avg resolution hours,
-	- SLA compliance,
-	- first response rate,
-	- weighted overall score.
-- weighted scoring formula:
-	- 30% resolution score,
-	- 30% SLA rate,
-	- 20% speed score,
-	- 20% first response rate.
-- `comparisonData` and `radarData` memos for charts.
-
----
-
-### `/admin` → `AdminPage`
-Access:
-- `admin`, `manager`.
-
-Purpose:
-- control plane for users, operations rules, and system settings.
-
-Tabs and internals:
-
-1. `ApprovalsTab`
-- fetches unapproved profiles and role mapping.
-- `approve` mutation marks `is_approved = true`.
-
-2. `AgentsTab`
-- lists agents and capacity/load.
-- supports add/edit (`upsert` mutation) and active toggle (`toggleActive`).
-- helper functions: `resetForm()`, `openEdit(agent)`.
-
-3. `SLARulesTab`
-- create/update/toggle SLA rules.
-- mutations: `upsert`, `toggleActive`.
-- helper functions: `resetForm()`, `openEdit(rule)`.
-
-4. `CategoriesTab`
-- displays static category catalog from constants.
-
-5. `SettingsTab`
-- organization profile form (currently demo-save toast).
-- account read-only details.
-
-`AdminPage` also fetches pending approval count for tab badge.
-
----
-
-### `*` → `NotFound`
-Purpose:
-- fallback route for unknown paths.
-
----
-
-### `Index.tsx`
-Contains a lightweight landing-style component in codebase, but app routing currently uses `DashboardPage` for `/`.
-
----
-
-## 4) Auth, Roles, and Access Control (Function-Level)
-
-## `AuthProvider` (`src/hooks/useAuth.tsx`)
-
-State managed:
-- `user`, `session`, `profile`, `roles`, `loading`.
-
-Core functions:
-- `fetchProfile(userId)` → loads `profiles` record.
-- `fetchRoles(userId)` → loads roles from `user_roles`.
-- `hasRole(role)` and `hasAnyRole(...roles)`.
-- `signIn(email, password)`.
-- `signUp(email, password, fullName, role)`; passes role in auth metadata.
-- `signOut()`.
-
-Derived auth flags:
-- `isApproved`, `isAdmin`, `isManager`, `isSupervisor`, `primaryRole`.
-
-## `ProtectedRoute` (`src/components/auth/ProtectedRoute.tsx`)
-
-Behavior:
-- blocks unauthenticated users (redirect `/login`).
-- enforces account approval status.
-- enforces optional role-based requirements.
-- emits toast on forbidden access.
-
----
-
-## 5) Frontend Hooks and Their Functions
-
-## `useComplaints.ts`
-Mapping functions:
-- `mapComplaint(row)`
-- `mapMessage(row)`
-- `mapAgent(row)`
-
-Query hooks:
-- `useComplaints()`
-	- realtime subscription on `complaints` table,
-	- returns ordered complaint list.
+**Data hooks**
 - `useComplaint(id)`
-- `useComplaintMessages(complaintId)`
-- `useAuditLog(complaintId)`
-- `useAgents()`
-- `useSlaRules()`
-
-Mutation hooks:
-- `useCreateComplaint()`
-	- inserts complaint,
-	- then asynchronously invokes `analyze-complaint`.
+- `useComplaintMessages(id)`
+- `useAuditLog(id)`
 - `useUpdateComplaint()`
-	- updates complaint,
-	- triggers `sla-notifications` for assignment events.
-- `useTriggerSlaCheck()`
-	- explicitly invokes SLA warning notification logic.
 
-## `useAIFeatures.ts`
-- `useGenerateResponse()` → `generate-response`
-- `useDetectDuplicates()` → `detect-duplicates`
-- `usePredictSlaBreach()` → `predict-sla`
-- `useAIInsights()` → `ai-insights`
-- `useAIChat()`
-	- local message state,
-	- streaming parser for SSE/OpenAI-style chunk format,
-	- `sendMessage(input)` and `clearChat()`.
+</details>
 
-## `useNotifications.ts`
-- fetches last 30 actionable audit events.
-- computes unread count from `localStorage` timestamp.
-- realtime subscription to `audit_log` inserts.
-- `markAllRead()` updates timestamp and resets counter.
+<details>
+<summary><b>📝 /new-complaint → NewComplaintPage (click to expand)</b></summary>
+
+**Purpose**
+- Validated complaint intake form.
+
+**Validation**
+- Zod schema `complaintSchema` + React Hook Form.
+
+**Key function**
+- `onSubmit(data)`
+  - create complaint
+  - success toast
+  - navigate dashboard
+
+**Backend effect**
+- async AI analysis trigger (`analyze-complaint`) from create hook.
+
+</details>
+
+<details>
+<summary><b>📈 /analytics → AnalyticsPage (click to expand)</b></summary>
+
+**Access**
+- `admin`, `manager`, `supervisor`
+
+**Purpose**
+- Management analytics + AI interpretation layer.
+
+**Tabs**
+- `AI Insights` (`AIInsightsPanel`)
+- `AI Assistant` (`AIAgentChat`)
+- `Charts`
+
+**Key memo**
+- `stats` computes volume, distribution, SLA and agent snapshots.
+
+</details>
+
+<details>
+<summary><b>📑 /reports → ReportsPage (click to expand)</b></summary>
+
+**Access**
+- `admin`, `manager`, `supervisor`
+
+**Purpose**
+- Compliance and operational reporting.
+
+**Tabs**
+- RBI Annexure report
+- SLA Breach report
+
+**Key functions**
+- `exportCSV(data, filename)`
+- `exportPDF(data, title)` using `jspdf` + `jspdf-autotable`
+- `downloadFile(content, filename, type)`
+- `getMostCommon(arr)`
+
+</details>
+
+<details>
+<summary><b>🏆 /performance → AgentPerformancePage (click to expand)</b></summary>
+
+**Access**
+- `admin`, `manager`, `supervisor`
+
+**Purpose**
+- Agent quality and productivity scoring.
+
+**Key metrics**
+- handled/resolved/open
+- avg resolution hours
+- SLA compliance
+- first response rate
+- overall weighted score
+
+**Score formula**
+- 30% resolution + 30% SLA + 20% speed + 20% first response.
+
+</details>
+
+<details>
+<summary><b>🛠 /admin → AdminPage (click to expand)</b></summary>
+
+**Access**
+- `admin`, `manager`
+
+**Purpose**
+- Operational control plane.
+
+**Tabs**
+- `ApprovalsTab`: approve pending users
+- `AgentsTab`: add/edit/toggle agents
+- `SLARulesTab`: create/update/toggle SLA rules
+- `CategoriesTab`: static category list
+- `SettingsTab`: organization + account display
+
+**Notable helpers**
+- `openEdit(...)`, `resetForm(...)` patterns in tab forms
+
+</details>
 
 ---
 
-## 6) AI Agents, NLP, and Decision Logic
+## 🔐 Auth and Role Model
 
-This project has two kinds of “agents”:
+### `AuthProvider` responsibilities
+- session and user state management
+- profile and role fetch
+- role-check helpers:
+  - `hasRole(role)`
+  - `hasAnyRole(...roles)`
+- auth actions:
+  - `signIn(email, password)`
+  - `signUp(email, password, fullName, role)`
+  - `signOut()`
 
-1) Human support agents (records in `agents` table), and
-2) AI agents/workflows (edge functions + chat assistant).
+### `ProtectedRoute` behavior
+- redirect unauthenticated users to `/login`
+- block non-approved users with pending-approval screen
+- enforce route-level role requirements
 
-### NLP/AI capabilities implemented
+### Role hierarchy
+- `admin` > `manager` > `supervisor` > `agent`
 
-1. Complaint analysis and triage
-- sentiment classification (`positive`, `neutral`, `negative`, `angry`)
-- sentiment score
+---
+
+## 🪝 Hooks and Frontend Function Map
+
+| Hook | Core responsibility | Key functions |
+|---|---|---|
+| `useComplaints` | complaint data + realtime list sync | `useComplaints`, `useComplaint`, `useComplaintMessages`, `useAuditLog` |
+| `useComplaints` (mutations) | complaint writes and side effects | `useCreateComplaint`, `useUpdateComplaint`, `useTriggerSlaCheck` |
+| `useComplaints` (support data) | related lookup data | `useAgents`, `useSlaRules` |
+| `useAIFeatures` | AI-driven actions | `useGenerateResponse`, `useDetectDuplicates`, `usePredictSlaBreach`, `useAIInsights`, `useAIChat` |
+| `useNotifications` | notification feed + unread state | realtime audit log subscription + `markAllRead()` |
+| `useAuth` | auth state and role model | sign-in/up/out and role checks |
+
+---
+
+## 🤖 AI/NLP Capabilities
+
+| Capability | Frontend entry | Edge function | Output |
+|---|---|---|---|
+| Complaint triage | New complaint flow | `analyze-complaint` | sentiment, severity, key issues, draft, optional category/priority/routing updates |
+| Duplicate detection | Complaint detail | `detect-duplicates` | match list with similarity and reason |
+| Response generation | Complaint detail | `generate-response` | tone-controlled customer reply + subject + key actions |
+| Predictive SLA risk | Dashboard widget | `predict-sla` | breach probability, risk factors, recommended action |
+| Trend insights | Analytics tab | `ai-insights` | executive summary, trends, root causes, recommendations |
+| AI assistant chat | Analytics tab | `ai-chat` | streaming operational assistant responses |
+
+### NLP dimensions applied
+- sentiment class + confidence score
 - severity score
-- key issue extraction
-- draft response generation
-- suggested category and priority
-- optional auto-routing recommendation
-
-2. Duplicate and pattern detection
-- compares incoming complaint against recent unresolved complaints
-- returns similarity scores and match types (`duplicate`, `related`, `pattern`)
-
-3. Response generation
-- tone-controlled response drafts (`formal`, `empathetic`, `escalation`)
-- subject line and key action extraction
-
-4. Predictive SLA breach analytics
-- per-ticket risk scores,
-- risk level,
-- risk factors,
-- recommended mitigation actions.
-
-5. AI insights panel
-- executive summary,
-- trends,
-- root causes,
-- prioritized recommendations,
-- risk alerts,
-- workload suggestions.
-
-6. AI assistant chat (streaming)
-- chat over live operational context,
-- references recent complaints and agent workload,
-- built for fast manager/agent decision support.
+- issue extraction
+- duplicate/pattern similarity
+- tone-conditioned generation
+- risk-level prediction
 
 ---
 
-## 7) Supabase Edge Functions (Backend Features in Detail)
+## ⚙ Backend Edge Functions
 
-All functions use Deno `serve` handlers and CORS support.
-
-## 1) `analyze-complaint`
-Input:
-- `complaint_id`, `subject`, `body`, `category`, `priority`, `customer_name`.
-
-Core logic:
-- fetches active agents and computes available pool (`current_load < max_complaints`),
-- sends structured prompt to AI,
-- expects tool call `analyze_complaint`.
-
-Writes/side-effects:
-- updates complaint AI fields,
-- optionally updates category/priority,
-- optionally auto-assigns and sets status `assigned`,
-- inserts audit logs (`ai_analysis`, `auto_categorize`, `auto_prioritize`, `auto_route`).
-
-Output:
-- structured `analysis`, plus `auto_routed` / `auto_categorized` / `auto_prioritized` flags.
-
-## 2) `detect-duplicates`
-Input:
-- `complaint_id`, `subject`, `body`, `category`, `customer_name`.
-
-Core logic:
-- fetches up to 50 recent non-closed complaints (excluding current),
-- uses tool call `report_duplicates`.
-
-Output:
-- enriched duplicate list with ticket metadata and similarity details.
-
-## 3) `generate-response`
-Input:
-- complaint context + tone + optional `conversation_history`.
-
-Core logic:
-- tone-specific instruction policy,
-- uses tool call `generate_response`.
-
-Output:
-- `response_text`, `subject_line`, `key_actions`.
-
-## 4) `predict-sla`
-Core logic:
-- loads currently open complaints,
-- loads historical resolved/closed sample,
-- computes category-priority baseline resolution times,
-- asks AI to predict breaches via tool call `predict_breaches`.
-
-Output:
-- risk predictions + summary, enriched with complaint IDs and metadata.
-
-## 5) `ai-insights`
-Core logic:
-- loads complaints + active agents,
-- computes distributions and aggregate operational metrics,
-- calls AI via tool `report_insights`.
-
-Output:
-- `executive_summary`, `trends`, `root_causes`, `recommendations`, `risk_alerts`, `workload_suggestions`.
-
-## 6) `ai-chat`
-Input:
-- message history array.
-
-Core logic:
-- fetches live complaints and agent context,
-- builds rich system prompt,
-- forwards to AI gateway in streaming mode.
-
-Output:
-- SSE stream (`text/event-stream`) for live assistant tokens.
-
-## 7) `sla-monitor`
-Core logic:
-- scans open complaints,
-- recalculates `sla_hours_remaining`,
-- derives `sla_status` as:
-	- `breached` when <= 0h,
-	- `at_risk` when <= 4h,
-	- otherwise `on_track`.
-
-Writes/side-effects:
-- patches changed complaint SLA fields,
-- writes audit events when entering at-risk/breached state.
-
-## 8) `sla-notifications`
-Input:
-- `type` as either `sla_warning` or `assignment` plus complaint context.
-
-Core logic:
-- logs notification events into `audit_log`.
-
-Additional behavior:
-- for SLA warnings, also updates complaint SLA status at thresholds.
-
-## 9) `track-complaint`
-Input:
-- `ticket_id`.
-
-Core logic:
-- validates strict ticket format,
-- fetches safe public complaint fields,
-- fetches non-internal messages,
-- masks customer name before returning.
-
-Output:
-- public-safe complaint object and communication history.
+| Function | Trigger / usage | Key logic | Side effects |
+|---|---|---|---|
+| `analyze-complaint` | after complaint creation | AI analysis + optional auto category/priority/routing | updates complaints + inserts audit events |
+| `detect-duplicates` | manual from detail page | compare against recent complaints | read-only |
+| `generate-response` | manual from detail page | tone-based response drafting | read-only |
+| `predict-sla` | manual widget action | open-ticket risk prediction | read-only |
+| `ai-insights` | analytics tab action | full-dataset trend and risk analysis | read-only |
+| `ai-chat` | assistant conversation | streaming contextual responses | read-only |
+| `sla-monitor` | periodic/scheduled | recompute hours remaining and status | updates complaints + logs warnings/breaches |
+| `sla-notifications` | assignment/SLA events | central notification + audit logging | writes audit + optional SLA status patch |
+| `track-complaint` | public tracking page | validated ticket lookup + safe public response | read-only public payload |
 
 ---
 
-## 8) Database Schema, RLS, Triggers, and Policies
+## 🗄 Database, RLS, Triggers
 
-### Core enum types
+### Core enums
 - `app_role`
 - `complaint_status`
 - `complaint_priority`
@@ -553,127 +413,110 @@ Output:
 - `audit_log`
 - `sla_rules`
 
-### Important helper functions (RLS support)
+### Security helper functions
 - `has_role(_user_id, _role)`
 - `is_assigned_to_complaint(_user_id, _complaint_id)`
 - `has_supervisor_access(_user_id)`
 - `get_agent_id(_user_id)`
 
-### Key triggers/functions
-- `handle_new_user` + trigger `on_auth_user_created`:
-	- creates profile and default role on signup.
-- `update_updated_at_column` triggers on major tables.
-- `generate_ticket_id` + trigger `generate_complaint_ticket_id`.
+### Triggers and automation
+- `on_auth_user_created` → default profile + role creation
+- `update_updated_at_column` triggers on operational tables
+- `generate_complaint_ticket_id` via `generate_ticket_id`
 
-### RLS pattern (final state)
-- role-scoped read/update policies for complaint operations,
-- supervisors/managers/admins can view broader scope,
-- agents are limited to own assigned/self-created/unassigned contexts in operational tables,
-- public tracking bypasses RLS through service role in edge function and explicit field whitelisting.
+### RLS model
+- role-scoped access for complaint operations
+- expanded visibility for supervisors/managers/admins
+- scoped write access for operational integrity
 
 ---
 
-## 9) Shared Components and Functional Responsibility
+## 🔄 End-to-End Flows
 
-### Layout
-- `AppShell`: shared page scaffold.
-- `AppSidebar`: role-aware navigation.
-- `Topbar`: page title/actions.
-- `NotificationBell`: unread events + mark-read integration.
+### 1) Complaint intake to AI triage
 
-### Complaint-specific components
-- `AgentAssignment`: supervisor assignment UI.
-- `AIResponseGenerator`: tone selector + draft generation.
-- `DuplicateDetector`: duplicate scan + match list.
-- `MessageComposer`: outbound/internal note composer.
-- Badge set:
-	- `StatusBadge`, `SeverityBadge`, `SentimentBadge`, `CategoryBadge`, `SLABadge`, `ChannelIcon`.
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant F as Frontend
+  participant DB as Supabase DB
+  participant FN as analyze-complaint
+  participant AI as AI Gateway
 
-### Analytics/AI components
-- `KPICard`: compact KPI presenter.
-- `PredictiveSLAWidget`: invokes predictive risk and displays high-risk items.
-- `AIInsightsPanel`: manager-facing insights renderer.
-- `AIAgentChat`: conversational analytics assistant UI.
+  U->>F: Submit complaint form
+  F->>DB: Insert complaint
+  F->>FN: Invoke analyze-complaint
+  FN->>AI: Structured analysis request
+  AI-->>FN: sentiment/severity/category/priority/route
+  FN->>DB: Update complaint + audit log
+  DB-->>F: Realtime/query refresh
+```
 
----
+### 2) Public tracking flow
 
-## 10) End-to-End Operational Flows
+```mermaid
+sequenceDiagram
+  participant C as Customer
+  participant P as Track Page
+  participant T as track-complaint
+  participant DB as Supabase DB
 
-### Flow A: New Complaint → AI triage
-1. user submits form in `NewComplaintPage`.
-2. complaint row inserted via `useCreateComplaint`.
-3. hook asynchronously invokes `analyze-complaint`.
-4. backend writes sentiment/severity/issues/draft, optionally recategorizes, reprioritizes, routes, and logs audit events.
-5. dashboard updates through query invalidation + realtime subscription.
-
-### Flow B: Agent handling a complaint
-1. open `ComplaintDetailPage`.
-2. review AI analysis and SLA status.
-3. generate response (tone-based) and send via composer.
-4. update status/escalate/assign as needed.
-5. audit log captures key actions.
-
-### Flow C: SLA operations
-1. periodic `sla-monitor` recalculates status/hours remaining.
-2. warning/breach transitions create audit records.
-3. notification bell surfaces events to users.
-4. managers review risk in dashboard/performance/analytics.
-
-### Flow D: Public customer tracking
-1. customer enters ticket at `/track`.
-2. `track-complaint` validates format and returns safe payload.
-3. UI renders status progression and communication timeline.
+  C->>P: Enter ticket ID
+  P->>T: Invoke with ticket_id
+  T->>DB: Fetch safe complaint fields + public messages
+  DB-->>T: complaint + messages
+  T-->>P: masked/public-safe response
+  P-->>C: status timeline + history
+```
 
 ---
 
-## 11) Local Development
+## 🧪 Run locally
 
-Requirements:
+### Requirements
 - Node.js 18+
 - npm
 
-Run:
+### Setup
 
 ```sh
 npm install
 npm run dev
 ```
 
-Useful scripts:
-- `npm run dev` — start dev server
-- `npm run build` — production build
-- `npm run preview` — preview build
-- `npm run lint` — ESLint
-- `npm run test` — Vitest
+### Scripts
+- `npm run dev` → start development server
+- `npm run build` → production build
+- `npm run preview` → preview production build
+- `npm run lint` → lint checks
+- `npm run test` → vitest tests
 
 ---
 
-## 12) Environment and Secrets
+## 🔑 Environment Variables
 
-Frontend (`.env` style):
+### Frontend
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
 
-Supabase Edge Functions secrets:
+### Edge functions / backend secrets
 - `AI_GATEWAY_API_KEY`
-- `AI_GATEWAY_URL` (optional; defaults to OpenRouter chat completions endpoint)
+- `AI_GATEWAY_URL` (optional)
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
 ---
 
-## 13) Known Gaps / Improvement Backlog
+## 📌 Known Gaps and Improvements
 
-Current implementation is strong, but these areas are still improvement opportunities:
-
-1. `AdminPage` SLA rule “Any” option currently uses string `any`; this can conflict with enum-backed DB fields if saved directly.
-2. `track-complaint` has an extra unused message fetch before uuid-based message fetch.
-3. `AnalyticsPage` includes one illustrative hardcoded metric fallback (`avgResolution = 18.5`) when there are resolved complaints.
-4. Some settings actions are demo-only (`SettingsTab` save toast).
-5. AI pipeline currently has no non-AI fallback path when gateway credits/rate limit are exhausted.
+1. `AdminPage` SLA “Any” handling uses string `any`; this can conflict with enum-backed DB fields.
+2. `track-complaint` contains one extra unused message-fetch request before UUID-based fetch.
+3. `AnalyticsPage` includes one illustrative fallback metric value (`avgResolution = 18.5`).
+4. `SettingsTab` save action is currently demo-style (toast only).
+5. AI workflows currently have no non-AI fallback if API credits/rate-limit fail.
 
 ---
 
-## 14) Selected Theme
+## 🏁 Selected Theme
 
-AI for Customer Experience, Service Operations, and Complaint Resolution (BFSI-focused)
+**AI for Customer Experience, Service Operations, and Complaint Resolution (BFSI-focused)**
