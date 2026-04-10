@@ -17,8 +17,13 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { Plus, Pencil, Users, Clock, Tag, Settings, UserCheck, AlertCircle } from 'lucide-react';
+import { Plus, Pencil, Users, Clock, Tag, Settings, UserCheck, AlertCircle, Trash2 } from 'lucide-react';
 import { CATEGORY_LABELS, PRIORITY_LABELS } from '@/lib/constants';
+import {
+  decrementPendingCount,
+  getPendingUserActionErrorMessage,
+  removePendingQueueUser,
+} from '@/lib/pendingUsers';
 
 // ─── Agents Tab ─────────────────────────────────────────────
 function AgentsTab() {
@@ -439,17 +444,89 @@ function ApprovalsTab() {
 
   const approve = useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ is_approved: true } as any)
-        .eq('user_id', userId);
-      if (error) throw error;
+      const { data, error } = await supabase
+        .rpc('approve_user_account', { _target_user_id: userId });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error('No pending user matched this action.');
+      }
+    },
+    onMutate: async (userId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['pending-approvals'] });
+      await queryClient.cancelQueries({ queryKey: ['pending-approvals-count'] });
+
+      const previousPending = queryClient.getQueryData<any[]>(['pending-approvals']) || [];
+      const previousCount = queryClient.getQueryData<number>(['pending-approvals-count']) || 0;
+
+      const nextPending = removePendingQueueUser(previousPending, userId);
+      queryClient.setQueryData(['pending-approvals'], nextPending);
+      queryClient.setQueryData(['pending-approvals-count'], decrementPendingCount(previousCount));
+
+      return { previousPending, previousCount };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pending-approvals'] });
       toast.success('User approved successfully');
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: any, _userId, context) => {
+      // Re-sync UI if server rejects approval.
+      if (context?.previousPending) {
+        queryClient.setQueryData(['pending-approvals'], context.previousPending);
+      }
+      if (typeof context?.previousCount === 'number') {
+        queryClient.setQueryData(['pending-approvals-count'], context.previousCount);
+      }
+      toast.error(getPendingUserActionErrorMessage('approve', e));
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['pending-approvals'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-approvals-count'] });
+    },
+  });
+
+  const removePending = useMutation({
+    mutationFn: async (userId: string) => {
+      const { data, error } = await supabase
+        .functions
+        .invoke('reject-pending-user', { body: { target_user_id: userId } });
+
+      if (error) throw error;
+      if (!data?.success) {
+        throw new Error(data?.error || 'Reject account action did not complete.');
+      }
+    },
+    onMutate: async (userId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['pending-approvals'] });
+      await queryClient.cancelQueries({ queryKey: ['pending-approvals-count'] });
+
+      const previousPending = queryClient.getQueryData<any[]>(['pending-approvals']) || [];
+      const previousCount = queryClient.getQueryData<number>(['pending-approvals-count']) || 0;
+
+      const nextPending = removePendingQueueUser(previousPending, userId);
+      queryClient.setQueryData(['pending-approvals'], nextPending);
+      queryClient.setQueryData(['pending-approvals-count'], decrementPendingCount(previousCount));
+
+      return { previousPending, previousCount };
+    },
+    onSuccess: () => {
+      toast.success('Pending user rejected successfully');
+    },
+    onError: (e: any, _userId, context) => {
+      if (context?.previousPending) {
+        queryClient.setQueryData(['pending-approvals'], context.previousPending);
+      }
+      if (typeof context?.previousCount === 'number') {
+        queryClient.setQueryData(['pending-approvals-count'], context.previousCount);
+      }
+      toast.error(getPendingUserActionErrorMessage('reject', e));
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['pending-approvals'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-approvals-count'] });
+    },
   });
 
   if (isLoading) return <Skeleton className="h-64 rounded-lg" />;
@@ -495,10 +572,21 @@ function ApprovalsTab() {
                     {new Date(user.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    <Button size="sm" onClick={() => approve.mutate(user.user_id)} disabled={approve.isPending}>
-                      <UserCheck className="w-3.5 h-3.5 mr-1.5" />
-                      Approve
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" onClick={() => approve.mutate(user.user_id)} disabled={approve.isPending || removePending.isPending}>
+                        <UserCheck className="w-3.5 h-3.5 mr-1.5" />
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => removePending.mutate(user.user_id)}
+                        disabled={approve.isPending || removePending.isPending}
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                        Reject
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

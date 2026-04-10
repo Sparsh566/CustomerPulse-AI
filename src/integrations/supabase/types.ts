@@ -389,6 +389,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_user_account: {
+        Args: { _target_user_id: string }
+        Returns: boolean
+      }
       get_agent_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
