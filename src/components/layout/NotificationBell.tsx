@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, AlertTriangle, Shield, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,21 @@ export default function NotificationBell() {
   const { notifications, unreadCount, markAllRead } = useNotifications();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+
+  const sortedNotifications = useMemo(() => {
+    const actionPriority: Record<string, number> = {
+      sla_breached: 3,
+      sla_warning: 2,
+      assignment_notification: 1,
+    };
+
+    return [...notifications].sort((a, b) => {
+      const priorityDiff = (actionPriority[b.action] ?? 0) - (actionPriority[a.action] ?? 0);
+      if (priorityDiff !== 0) return priorityDiff;
+
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [notifications]);
 
   const getIcon = (action: string) => {
     switch (action) {
@@ -44,16 +59,16 @@ export default function NotificationBell() {
       <PopoverContent align="end" className="w-80 p-0">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
-          {notifications.length > 0 && (
-            <span className="text-[10px] text-muted-foreground">{notifications.length} recent</span>
+          {sortedNotifications.length > 0 && (
+            <span className="text-[10px] text-muted-foreground">{sortedNotifications.length} recent</span>
           )}
         </div>
         <ScrollArea className="max-h-80">
-          {notifications.length === 0 ? (
+          {sortedNotifications.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">No notifications yet</p>
           ) : (
             <div className="divide-y divide-border">
-              {notifications.map((n) => (
+              {sortedNotifications.map((n) => (
                 <button
                   key={n.id}
                   className={cn(
@@ -61,7 +76,9 @@ export default function NotificationBell() {
                   )}
                   onClick={() => {
                     setOpen(false);
-                    navigate(`/complaints/${n.complaint_id}`);
+                    if (n.complaint_id) {
+                      navigate(`/complaint/${n.complaint_id}`);
+                    }
                   }}
                 >
                   {getIcon(n.action)}
